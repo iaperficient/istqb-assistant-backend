@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.Python
+build/
+dist/
+venv/
+env/
+.env
+.venv/
+
+# Entorno Virtual (asegúrate de que el nombre coincida con el que usas)
+# Es muy común usar 'venv', 'env' o '.venv'
+# Descomenta y ajusta si usas un nombre diferente
+# my_virtual_env_name/
+
+# IDEs y Editores
+.vscode/        # Configuración de VS Code (opcional, si no quieres compartirla)
+.idea/          # Directorios de configuración de IntelliJ/PyCharm
+*.iml           # Archivos de módulos de IntelliJ
+*.ipr
+*.iws
+
+# Logs y bases de datos locales
+*.log
+*.sqlite3       # Archivos de base de datos SQLite (si usas para desarrollo local)
+db.sqlite3      # Nombre común para SQLite en Flask/Django
+*.db
+
+# Archivos de depuración y temporales
+.DS_Store       # Archivos de macOS
+*.swp           # Archivos de intercambio de Vim
+*~              # Archivos de respaldo de editores (e.g., Emacs)
+.#* # Archivos de bloqueo de Emacs
+Thumbs.db       # Archivos de caché de miniaturas de Windows
+ehthumbs.db
+.cache/         # Cachés genéricas
+.pytest_cache/  # Caché de pytest
+
+# Archivos de credenciales y configuración sensibles
+.env            # Variables de entorno (¡MUY IMPORTANTE para seguridad!)
+.flaskenv       # Variables de entorno específicas de Flask (si usas Flask-DotEnv)
+
+# Jupyter Notebook (si aplica)
+.ipynb_checkpoints
+
+# Docker (si tienes archivos específicos de desarrollo/test)
+# docker-compose.override.yml
+
+# Archivos de cobertura de tests
+.coverage
+htmlcov/
+.coverage.*
+
+# Misceláneos
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/           # Directorio de tox (herramienta de entornos de test)
+.mypy_cache/    # Caché de MyPy (type checker)
