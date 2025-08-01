@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from typing import Optional
+import os
 from app.database.connection import get_db
 from app.auth.sso import sso_manager
 from app.schemas.user import Token
@@ -64,7 +65,7 @@ async def sso_callback(
     db: Session = Depends(get_db)
 ):
     """Handle SSO callback and redirect to frontend callback route"""
-    frontend_url = "http://localhost:5173"
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
     
     # Always redirect to the frontend callback route with all parameters
     # The frontend will handle the authentication logic
