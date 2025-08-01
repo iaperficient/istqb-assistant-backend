@@ -161,7 +161,10 @@ async def _upload_document(
     db.commit()
     db.refresh(document)
     
-    # Process document for RAG (if available)
+    # Process document for RAG (using safe vector store loading)
+    rag_success = False
+    rag_error = None
+    
     vector_store = get_vector_store_manager_safe()
     if vector_store:
         try:
@@ -173,21 +176,32 @@ async def _upload_document(
                 "document_id": document.id
             }
             
-            success = vector_store.add_pdf_to_rag(content, metadata)
-            if success:
+            rag_success = vector_store.add_pdf_to_rag(content, metadata)
+            if rag_success:
                 document.is_processed = True
                 db.commit()
                 db.refresh(document)
             
         except Exception as e:
+            rag_error = str(e)
             print(f"Warning: Failed to add document to RAG: {e}")
     else:
+        rag_error = "Vector store not available"
         print("Vector store not available, skipping RAG processing")
+    
+    # Prepare response message
+    if rag_success:
+        message = f"Document '{title}' uploaded and processed successfully into RAG"
+    else:
+        message = f"Document '{title}' uploaded but RAG processing failed"
+        if rag_error:
+            message += f": {rag_error}"
     
     return {
         "is_duplicate": False,
         "document": document,
-        "message": f"Document '{title}' uploaded and processed successfully"
+        "message": message,
+        "rag_processed": rag_success
     }
 
 @router.get("/{certification_id}/documents", response_model=List[DocumentResponse])
