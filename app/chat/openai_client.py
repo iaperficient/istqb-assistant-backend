@@ -1,4 +1,5 @@
 import os
+import httpx
 from openai import OpenAI
 from fastapi import HTTPException
 from typing import Optional
@@ -23,19 +24,54 @@ class OpenAIClient:
             if vector_store.is_initialized():
                 rag_result = vector_store.get_context_for_query(message, certification_code)
             
-            system_prompt = """You are an ISTQB (International Software Testing Qualifications Board) assistant. 
-            You help users understand software testing concepts, methodologies, and best practices according to ISTQB standards.
-            Provide clear, accurate, and educational responses about software testing.
+            # Query additional info from API endpoint if relevant
+            api_info = ""
+            async with httpx.AsyncClient() as client:
+                # Example: query certifications endpoint if message contains keywords
+                if any(keyword in message.lower() for keyword in ["certification", "certifications", "certificate", "certificates"]):
+                    try:
+                        response = await client.get("http://127.0.0.1:8000/certifications/")
+                        if response.status_code == 200:
+                            data = response.json()
+                            # Format data as string to include in prompt
+                            api_info = "Additional certification info from API:\n"
+                            for cert in data:
+                                api_info += f"- {cert.get('name', 'Unknown')} (Code: {cert.get('code', 'N/A')})\n"
+                            # If API info is available, prioritize it by ignoring RAG context
+                            rag_result = {"context": "", "sources": [], "retrieval_successful": False}
+                    except Exception as e:
+                        api_info = f"Warning: Failed to fetch certification info from API: {str(e)}"
             
-            Use the provided context information from ISTQB certification materials to enhance your responses when relevant, 
-            but also rely on your training knowledge. If the context doesn't contain relevant information, 
-            provide helpful responses based on your knowledge of ISTQB and software testing."""
+            system_prompt = """
+You are a virtual assistant specialized ONLY in these three ISTQB certifications:
+1. Certified Tester Foundation Level (CTFL) v4.0
+2. Certified Tester Testing with Generative AI (CT-GenAI)
+3. Certified Tester AI Testing (CT-AI)
+
+Instructions:
+
+- Always answer in a friendly, respectful, and professional manner.
+- Only use the embedded information about these three certifications. Do not invent or assume information from other ISTQB certifications or outside knowledge.
+- If a user question could refer to more than one certification (for example, “What are the Business Outcomes?”), always ask which certification they mean before answering. Never assume.
+- If you don’t have enough information to answer from your embedded content, say so politely.
+- Present your answers using plain text only, in a clean and organized way:
+    - Use clear section titles, written in a separate line (for example: Overview, Purpose, Structure, etc.).
+    - Use dashes or numbers for lists.
+    - Separate each section with a blank line.
+    - Do not use HTML, markdown, asterisks, or the # symbol.
+- Always keep the conversation context: if the user is asking about a specific certification, continue answering about that certification unless the user explicitly changes to another certification.
+- If the user asks for a document, provide the direct link if available.
+"""
             
             messages = [{"role": "system", "content": system_prompt}]
             
             # Add RAG context if available
             if rag_result["context"]:
                 messages.append({"role": "user", "content": f"Relevant context from ISTQB materials:\n{rag_result['context']}"})
+            
+            # Add API info if available
+            if api_info:
+                messages.append({"role": "user", "content": api_info})
             
             # Add user-provided context if available
             if context:
@@ -44,10 +80,10 @@ class OpenAIClient:
             messages.append({"role": "user", "content": message})
             
             response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",
                 messages=messages,
                 max_tokens=1000,
-                temperature=0.7
+                temperature=0.4
             )
             
             return {
