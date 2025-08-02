@@ -65,7 +65,7 @@ async def sso_callback(
     db: Session = Depends(get_db)
 ):
     """Handle SSO callback and redirect to frontend callback route"""
-    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    frontend_url = os.getenv("FRONTEND_URL", "https://polite-pond-062e1a203-2.westeurope.1.azurestaticapps.net")
     
     # Always redirect to the frontend callback route with all parameters
     # The frontend will handle the authentication logic
