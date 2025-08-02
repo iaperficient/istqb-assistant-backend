@@ -35,27 +35,15 @@
 
 ## 4. User Profile Management
 - **Persona**: Authenticated user
-- **Story Statement**: As an authenticated user, I want to view and manage my profile information so that I can keep my account up to date.
-- **Benefit**: Personalized user experience and account management.
+- **Story Statement**: As an authenticated user, I want to view my profile information so that I can see my account details.
+- **Benefit**: Access to personal account information.
 - **Acceptance Criteria**:
   - User can view their current profile information.
-  - User can update their profile details.
   - Profile shows authentication method (regular or SSO).
-- **Mapped Endpoints**:
+- **Mapped Endpoint**:
   - `GET /auth/me` (Get current user profile)
-  - `PUT /auth/profile` (Update user profile)
 
-## 5. Logout and Token Management
-- **Persona**: Authenticated user
-- **Story Statement**: As an authenticated user, I want to securely log out so that my session is properly terminated.
-- **Benefit**: Security and privacy protection.
-- **Acceptance Criteria**:
-  - User can log out and invalidate their session.
-  - JWT tokens are properly handled on logout.
-  - User is redirected to login page after logout.
-- **Mapped Endpoint**: `POST /auth/logout`
-
-## 6. Chat with ISTQB Assistant
+## 5. Chat with ISTQB Assistant
 - **Persona**: Authenticated user
 - **Story Statement**: As a user, I want to ask questions about software testing concepts and receive intelligent answers.
 - **Benefit**: Expedited learning and assistance on software testing matters.
@@ -66,31 +54,7 @@
   - Chat history is maintained during the session.
 - **Mapped Endpoint**: `POST /chat/`
 
-## 7. Chat History Management
-- **Persona**: Authenticated user
-- **Story Statement**: As a user, I want to view my previous chat conversations so that I can reference past discussions.
-- **Benefit**: Continuity in learning and ability to revisit previous topics.
-- **Acceptance Criteria**:
-  - User can view their chat history.
-  - Chat sessions are organized by date and topic.
-  - User can search through their chat history.
-- **Mapped Endpoints**:
-  - `GET /chat/history` (Get user's chat history)
-  - `GET /chat/history/{session_id}` (Get specific chat session)
-
-## 8. Admin Dashboard Access
-- **Persona**: Admin user
-- **Story Statement**: As an admin, I want to access an administrative dashboard so that I can manage the system effectively.
-- **Benefit**: Centralized administration and system monitoring.
-- **Acceptance Criteria**:
-  - Admin can access dashboard with admin-only features.
-  - Dashboard shows system statistics and user metrics.
-  - Admin role is required for access.
-- **Mapped Endpoints**:
-  - `GET /admin/dashboard` (Get admin dashboard data)
-  - `GET /admin/users` (Manage users)
-
-## 9. Upload Certification Documents
+## 6. Upload Certification Documents
 - **Persona**: Admin user
 - **Story Statement**: As an admin, I want to upload syllabus and sample exam documents for certifications.
 - **Benefit**: Maintain and update certification materials for better assistant responses.
@@ -104,7 +68,7 @@
   - `POST /certifications/{certification_id}/documents/sample-exam`
   - `GET /certifications/{certification_id}/documents` (List documents)
 
-## 10. Manage Certifications
+## 7. Manage Certifications
 - **Persona**: Admin user
 - **Story Statement**: As an admin, I want to view, create, and manage certifications easily.
 - **Benefit**: Centralized management of certification data and materials.
@@ -112,15 +76,13 @@
   - Able to create new certification entries with details.
   - Option to soft delete certifications.
   - Listings include all active certifications.
-  - Can update certification information.
 - **Mapped Endpoints**:
   - `POST /certifications/` (Create certification)
   - `GET /certifications/` (View all certifications)
   - `GET /certifications/{certification_id}` (Get specific certification)
-  - `PUT /certifications/{certification_id}` (Update certification)
   - `DELETE /certifications/{certification_id}` (Delete certification)
 
-## 11. System Health and Monitoring
+## 8. System Health and Monitoring
 - **Persona**: System administrator/Developer
 - **Story Statement**: As a system administrator, I want to monitor the health and status of the application.
 - **Benefit**: Proactive system maintenance and issue detection.
@@ -132,7 +94,7 @@
   - `GET /health` (System health check)
   - `GET /docs` (API documentation)
 
-## 12. Error Handling and User Feedback
+## 9. Error Handling and User Feedback
 - **Persona**: Any user
 - **Story Statement**: As a user, I want to receive clear error messages and feedback when something goes wrong.
 - **Benefit**: Better user experience and easier troubleshooting.
