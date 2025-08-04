@@ -13,6 +13,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import os
+print(f"DEBUG: FULL OPENAI_API_KEY from environment: {os.getenv('OPENAI_API_KEY')}")
+
 # Create all tables
 User.metadata.create_all(bind=engine)
 Certification.metadata.create_all(bind=engine)
