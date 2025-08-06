@@ -11,6 +11,7 @@ class ChatMessage(BaseModel):
     message: str
     context: Optional[str] = None
     certification_code: Optional[str] = None
+    conversation_id: Optional[str] = None
 
 class ChatResponse(BaseModel):
     response: str

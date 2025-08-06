@@ -7,17 +7,22 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.schema import Document
 import tempfile
+import os
+os.environ["OPENAI_API_KEY"] = "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"
 
 class VectorStoreManager:
     def __init__(self, persist_directory: str = "./chroma_db"):
         self.persist_directory = persist_directory
         self.embeddings = OpenAIEmbeddings()
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
+            chunk_size=1500,
             chunk_overlap=200,
             length_function=len,
+            
         )
         self._vector_store = None
+        self.embeddings = OpenAIEmbeddings()
+
     
     @property
     def vector_store(self):
@@ -85,6 +90,7 @@ class VectorStoreManager:
             similar_docs = self.search_similar(query, k=5, filter_dict=filter_dict)
             
             if not similar_docs:
+                print("No similar documents found for query.")
                 return {
                     "context": "",
                     "sources": [],
@@ -95,7 +101,9 @@ class VectorStoreManager:
             contexts = []
             sources = []
             
-            for doc in similar_docs:
+            print(f"Found {len(similar_docs)} similar documents for query: {query}")
+            for i, doc in enumerate(similar_docs):
+                print(f"Document {i+1} content preview: {doc.page_content[:200]}...")
                 contexts.append(doc.page_content)
                 source_info = {
                     "certification_code": doc.metadata.get("certification_code", "Unknown"),
@@ -106,6 +114,8 @@ class VectorStoreManager:
                     sources.append(source_info)
             
             combined_context = "\n\n".join(contexts)
+            
+            print(f"Combined context length: {len(combined_context)} characters")
             
             return {
                 "context": combined_context,

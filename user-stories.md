@@ -1,107 +1,138 @@
-# User Stories
+# User Stories - Simple ISTQB Chatbot
 
-## 1. Register a User
-- **Persona**: New user
-- **Story Statement**: As a new user, I want to register an account so that I can access the ISTQB Assistant features.
-- **Benefit**: Secure access to the assistant with personalized user management.
-- **Acceptance Criteria**:
-  - User can register with a unique email and username.
-  - Registration fails if email or username already exists.
-- **Mapped Endpoint**: `POST /auth/register`
+## Story 1: User Registration and Login
 
-## 2. Authenticate and Login
-- **Persona**: Registered user
-- **Story Statement**: As a registered user, I want to log in to access the ISTQB Assistant's functionality.
-- **Benefit**: Authentication for personalized experiences and security.
-- **Acceptance Criteria**:
-  - User receives a JWT token upon successful login.
-  - Access token is provided for authenticated access.
-- **Mapped Endpoint**: `POST /auth/login`
+**Persona:** Alex, a QA Professional  
+**Story Statement:** As a QA professional, I want to register an account and log in so that I can access the ISTQB chatbot.
 
-## 3. Single Sign-On (SSO) Authentication
-- **Persona**: User (new or existing)
-- **Story Statement**: As a user, I want to authenticate using my GitHub account so that I can quickly access the ISTQB Assistant without creating a separate account.
-- **Benefit**: Streamlined authentication process and improved user experience.
-- **Acceptance Criteria**:
-  - User can initiate SSO login with GitHub.
-  - System creates user account automatically if it doesn't exist.
-  - User receives a JWT token upon successful SSO authentication.
-  - User is redirected back to the application after authentication.
-- **Mapped Endpoints**: 
-  - `GET /auth/sso/providers` (Get available SSO providers)
-  - `GET /auth/sso/{provider}/login` (Initiate SSO login)
-  - `GET /auth/sso/{provider}/callback` (Handle SSO callback)
-  - `POST /auth/sso/{provider}/authenticate` (Authenticate with SSO)
+**Benefit:** Provides secure access to the chatbot functionality.
 
-## 4. User Profile Management
-- **Persona**: Authenticated user
-- **Story Statement**: As an authenticated user, I want to view my profile information so that I can see my account details.
-- **Benefit**: Access to personal account information.
-- **Acceptance Criteria**:
-  - User can view their current profile information.
-  - Profile shows authentication method (regular or SSO).
-- **Mapped Endpoint**:
-  - `GET /auth/me` (Get current user profile)
+**Acceptance Criteria:**
+- User can register with username/email and password
+- User can log in with valid credentials
+- System returns JWT token or session cookie on successful login
+- Invalid credentials return appropriate error message
+- Registration validates required fields
 
-## 5. Chat with ISTQB Assistant
-- **Persona**: Authenticated user
-- **Story Statement**: As a user, I want to ask questions about software testing concepts and receive intelligent answers.
-- **Benefit**: Expedited learning and assistance on software testing matters.
-- **Acceptance Criteria**:
-  - User receives coherent and precise answers about ISTQB topics.
-  - Option to include context and certification code in queries.
-  - Responses are based on official ISTQB documentation.
-  - Chat history is maintained during the session.
-- **Mapped Endpoint**: `POST /chat/`
+**Mapped Endpoints:**
+- `POST /users/register` - User registration
+- `POST /users/login` - User authentication
 
-## 6. Upload Certification Documents
-- **Persona**: Admin user
-- **Story Statement**: As an admin, I want to upload syllabus and sample exam documents for certifications.
-- **Benefit**: Maintain and update certification materials for better assistant responses.
-- **Acceptance Criteria**:
-  - Admin can upload PDF documents.
-  - Duplicate documents are recognized and alerts provided.
-  - Documents are processed and indexed for chat responses.
-  - File size and format validation.
-- **Mapped Endpoints**:
-  - `POST /certifications/{certification_id}/documents/syllabus`
-  - `POST /certifications/{certification_id}/documents/sample-exam`
-  - `GET /certifications/{certification_id}/documents` (List documents)
+---
 
-## 7. Manage Certifications
-- **Persona**: Admin user
-- **Story Statement**: As an admin, I want to view, create, and manage certifications easily.
-- **Benefit**: Centralized management of certification data and materials.
-- **Acceptance Criteria**:
-  - Able to create new certification entries with details.
-  - Option to soft delete certifications.
-  - Listings include all active certifications.
-- **Mapped Endpoints**:
-  - `POST /certifications/` (Create certification)
-  - `GET /certifications/` (View all certifications)
-  - `GET /certifications/{certification_id}` (Get specific certification)
-  - `DELETE /certifications/{certification_id}` (Delete certification)
+## Story 2: Protected Chat Access
 
-## 8. System Health and Monitoring
-- **Persona**: System administrator/Developer
-- **Story Statement**: As a system administrator, I want to monitor the health and status of the application.
-- **Benefit**: Proactive system maintenance and issue detection.
-- **Acceptance Criteria**:
-  - Health endpoint returns system status.
-  - API documentation is available.
-  - System logs are accessible for debugging.
-- **Mapped Endpoints**:
-  - `GET /health` (System health check)
-  - `GET /docs` (API documentation)
+**Persona:** Alex, a QA Professional  
+**Story Statement:** As a logged-in user, I want to send messages to the ISTQB chatbot so that I can get answers about testing and certification topics.
 
-## 9. Error Handling and User Feedback
-- **Persona**: Any user
-- **Story Statement**: As a user, I want to receive clear error messages and feedback when something goes wrong.
-- **Benefit**: Better user experience and easier troubleshooting.
-- **Acceptance Criteria**:
-  - Clear, user-friendly error messages.
-  - Appropriate HTTP status codes.
-  - Validation errors provide specific guidance.
-  - Rate limiting with clear feedback.
-- **Implementation**: Consistent across all endpoints
+**Benefit:** Enables authenticated users to interact with the AI chatbot for ISTQB guidance.
 
+**Acceptance Criteria:**
+- Only authenticated users can access the chat endpoint
+- User can send text messages to the chatbot
+- Chatbot responds with relevant information about ISTQB topics
+- Unauthenticated requests are rejected with 401 status
+- System handles rate limiting gracefully
+- Error responses are user-friendly
+
+**Mapped Endpoints:**
+- `POST /chat` - Send message to chatbot (protected)
+
+---
+
+## Story 3: Knowledge Base Integration
+
+**Persona:** Alex, a QA Professional  
+**Story Statement:** As a user asking about ISTQB topics, I want the chatbot to provide accurate answers based on a knowledge base so that I get relevant and consistent information.
+
+**Benefit:** Provides contextual responses by retrieving relevant information from a predefined knowledge base before generating AI responses.
+
+**Acceptance Criteria:**
+- System searches knowledge base for relevant content based on user query
+- Retrieved context is included in the AI prompt
+- Chatbot responses reference knowledge base information when available
+- System gracefully handles queries with no matching knowledge base entries
+- Knowledge base covers common ISTQB FAQ topics
+
+**Mapped Endpoints:**
+- `POST /chat` - Enhanced with knowledge retrieval logic
+
+---
+
+## Story 4: Health Check and Monitoring
+
+**Persona:** DevOps Engineer  
+**Story Statement:** As a DevOps engineer, I want to monitor the health of the chatbot service so that I can ensure it's running properly in production.
+
+**Benefit:** Enables monitoring and quick detection of service issues.
+
+**Acceptance Criteria:**
+- Health check endpoint returns service status
+- Endpoint checks database connectivity and external API availability
+- Returns appropriate HTTP status codes
+- Includes basic service information in response
+- Does not require authentication
+
+**Mapped Endpoints:**
+- `GET /health` - Service health check
+
+---
+
+## Story 5: Error Handling and Rate Limiting
+
+**Persona:** Alex, a QA Professional  
+**Story Statement:** As a user of the chatbot, I want to receive clear error messages and fair usage limits so that I understand any issues and can use the service appropriately.
+
+**Benefit:** Provides a stable and fair service experience for all users.
+
+**Acceptance Criteria:**
+- API rate limiting prevents abuse
+- Clear error messages for authentication failures
+- Graceful handling of external API failures (LLM service)
+- Appropriate HTTP status codes for different error types
+- Consistent error response format across all endpoints
+
+**Mapped Endpoints:**
+- All endpoints include proper error handling
+- Rate limiting middleware applied to `POST /chat`
+
+---
+
+## Technical Implementation Summary
+
+### Core Components
+- **Authentication**: JWT-based auth with register/login endpoints
+- **Chat API**: Protected endpoint that integrates with LLM service
+- **Knowledge Base**: JSON/YAML file with ISTQB FAQs for context retrieval
+- **Error Handling**: Consistent error responses and rate limiting
+
+### Knowledge Base Structure
+```json
+{
+  "faqs": [
+    {
+      "topic": "Foundation Level",
+      "question": "What is ISTQB Foundation Level?",
+      "answer": "The Foundation Level is the entry-level certification..."
+    }
+  ]
+}
+```
+
+### Authentication Flow
+1. User registers/logs in via `/users/register` or `/users/login`
+2. Server returns JWT token
+3. Client includes token in Authorization header for `/chat` requests
+4. Middleware validates token before processing chat requests
+
+### Chat Flow
+1. User sends message to `/chat` with valid auth token
+2. System searches knowledge base for relevant context
+3. Context + user message sent to LLM API
+4. AI response returned to user
+
+### Deployment Requirements
+- Environment variables for API keys and configuration
+- Docker containerization
+- CI/CD pipeline with automated testing
+- Cloud deployment (K8s manifests or serverless)

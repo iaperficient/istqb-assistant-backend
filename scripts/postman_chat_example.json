@@ -1,0 +1,45 @@
+{
+  "info": {
+    "name": "Chat API Example",
+    "_postman_id": "12345678-abcd-efgh-ijkl-1234567890ab",
+    "description": "Example Postman collection to test chat endpoint with conversation_id",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Send Chat Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc1NDAyMjQ5OX0.d9QfXdUV-Bj0NLuj3_Fhz_V7YXRmUaBFltAYNVdlxIo",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Hola, esta es una prueba de contexto.\",\n  \"conversation_id\": \"test-session-1\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/chat/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "chat",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -4,6 +4,7 @@ from app.database.connection import engine
 from app.models.user import User
 from app.models.certification import Certification
 from app.models.document import Document
+from app.models.chat import ChatMessage
 from app.auth.routes import router as auth_router
 from app.auth.sso_routes import router as sso_router
 from app.chat.routes import router as chat_router
@@ -13,10 +14,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import os
+print(f"DEBUG: FULL OPENAI_API_KEY from environment: {os.getenv('OPENAI_API_KEY')}")
+
 # Create all tables
 User.metadata.create_all(bind=engine)
 Certification.metadata.create_all(bind=engine)
 Document.metadata.create_all(bind=engine)
+ChatMessage.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="ISTQB Assistant API",
