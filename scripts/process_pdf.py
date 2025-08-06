@@ -20,16 +20,21 @@ def process_pdf(file_path: str, metadata: dict):
     return success
 
 if __name__ == "__main__":
-    # Define the path to the PDF file
-    pdf_path = "uploads/certifications/Foundation Level/ISTQB_CTFL_Syllabus_v4.0.1.pdf"
+    import argparse
+    parser = argparse.ArgumentParser(description="Embed a PDF into the vector store with metadata.")
+    parser.add_argument("pdf_path", type=str, help="Path to the PDF file.")
+    parser.add_argument("--certification_code", type=str, required=True, help="Certification code.")
+    parser.add_argument("--certification_name", type=str, required=True, help="Certification name.")
+    parser.add_argument("--document_type", type=str, required=True, help="Document type.")
+    parser.add_argument("--title", type=str, required=True, help="Document title.")
+    parser.add_argument("--document_id", type=str, required=True, help="Document ID.")
 
-    # Define metadata for the PDF
+    args = parser.parse_args()
     metadata = {
-        "certification_code": "FOUNDATION_LEVEL",
-        "certification_name": "Foundation Level",
-        "document_type": "SYLLABUS",
-        "title": "ISTQB CTFL Syllabus v4.0.1",
-        "document_id": "manual_process_001"
+        "certification_code": args.certification_code,
+        "certification_name": args.certification_name,
+        "document_type": args.document_type,
+        "title": args.title,
+        "document_id": args.document_id
     }
-
-    process_pdf(pdf_path, metadata)
+    process_pdf(args.pdf_path, metadata)
