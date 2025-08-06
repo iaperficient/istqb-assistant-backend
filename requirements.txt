@@ -16,6 +16,7 @@ langchain-chroma
 chromadb
 beautifulsoup4
 requests
+httpx
 pypdf
 python-magic
 aiofiles

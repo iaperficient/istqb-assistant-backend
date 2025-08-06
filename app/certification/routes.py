@@ -13,7 +13,27 @@ from app.schemas.certification import (
 )
 from app.auth.oauth2 import get_current_active_user
 from app.auth.role_middleware import require_admin_checker
-from app.rag.vector_store import get_vector_store_manager
+
+# Vector store will be imported on-demand to avoid startup failures
+VECTOR_STORE_AVAILABLE = None  # Will be determined on first use
+
+def get_vector_store_manager_safe():
+    """Safely get vector store manager, returns None if not available"""
+    global VECTOR_STORE_AVAILABLE
+    if VECTOR_STORE_AVAILABLE is None:
+        try:
+            from app.rag.vector_store import get_vector_store_manager
+            VECTOR_STORE_AVAILABLE = True
+            return get_vector_store_manager()
+        except ImportError as e:
+            print(f"Warning: Vector store not available: {e}")
+            VECTOR_STORE_AVAILABLE = False
+            return None
+    elif VECTOR_STORE_AVAILABLE:
+        from app.rag.vector_store import get_vector_store_manager
+        return get_vector_store_manager()
+    else:
+        return None
 from app.utils.document_utils import calculate_pdf_hash, check_document_duplicate, get_duplicate_info
 import aiofiles
 
@@ -141,30 +161,47 @@ async def _upload_document(
     db.commit()
     db.refresh(document)
     
-    # Process document for RAG
-    try:
-        vector_store = get_vector_store_manager()
-        metadata = {
-            "certification_code": certification.code,
-            "certification_name": certification.name,
-            "document_type": document_type.value,
-            "title": title,
-            "document_id": document.id
-        }
-        
-        success = vector_store.add_pdf_to_rag(content, metadata)
-        if success:
-            document.is_processed = True
-            db.commit()
-            db.refresh(document)
-        
-    except Exception as e:
-        print(f"Warning: Failed to add document to RAG: {e}")
+    # Process document for RAG (using safe vector store loading)
+    rag_success = False
+    rag_error = None
+    
+    vector_store = get_vector_store_manager_safe()
+    if vector_store:
+        try:
+            metadata = {
+                "certification_code": certification.code,
+                "certification_name": certification.name,
+                "document_type": document_type.value,
+                "title": title,
+                "document_id": document.id
+            }
+            
+            rag_success = vector_store.add_pdf_to_rag(content, metadata)
+            if rag_success:
+                document.is_processed = True
+                db.commit()
+                db.refresh(document)
+            
+        except Exception as e:
+            rag_error = str(e)
+            print(f"Warning: Failed to add document to RAG: {e}")
+    else:
+        rag_error = "Vector store not available"
+        print("Vector store not available, skipping RAG processing")
+    
+    # Prepare response message
+    if rag_success:
+        message = f"Document '{title}' uploaded and processed successfully into RAG"
+    else:
+        message = f"Document '{title}' uploaded but RAG processing failed"
+        if rag_error:
+            message += f": {rag_error}"
     
     return {
         "is_duplicate": False,
         "document": document,
-        "message": f"Document '{title}' uploaded and processed successfully"
+        "message": message,
+        "rag_processed": rag_success
     }
 
 @router.get("/{certification_id}/documents", response_model=List[DocumentResponse])
@@ -196,12 +233,13 @@ async def delete_certification(
     certification.is_active = False
     db.commit()
     
-    # Clean up RAG data
-    try:
-        vector_store = get_vector_store_manager()
-        vector_store.delete_certification_documents(certification.code)
-    except Exception as e:
-        print(f"Warning: Failed to clean up RAG data: {e}")
+    # Clean up RAG data (if available)
+    vector_store = get_vector_store_manager_safe()
+    if vector_store:
+        try:
+            vector_store.delete_certification_documents(certification.code)
+        except Exception as e:
+            print(f"Warning: Failed to clean up RAG data: {e}")
     
     return {"message": f"Certification {certification.code} has been deactivated"}
 
@@ -218,7 +256,13 @@ async def reprocess_certification_documents(
     
     documents = db.query(Document).filter(Document.certification_id == certification_id).all()
     
-    vector_store = get_vector_store_manager()
+    vector_store = get_vector_store_manager_safe()
+    if not vector_store:
+        return {
+            "message": "Vector store not available, cannot reprocess documents",
+            "processed_count": 0,
+            "total_documents": len(documents)
+        }
     processed_count = 0
     
     for document in documents:
