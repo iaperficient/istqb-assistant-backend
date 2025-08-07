@@ -56,3 +56,9 @@ async def startup_event():
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "service": "ISTQB Assistant API"}
+    if __name__ == "__main__":
+    import uvicorn
+    import os
+
+    port = int(os.environ.get("PORT", 8080))  # Usa el puerto que Azure define
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
