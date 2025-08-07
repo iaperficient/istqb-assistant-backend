@@ -14,29 +14,35 @@ router = APIRouter(prefix="/auth", tags=["authentication"])
 
 @router.post("/register", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(
-        (User.email == user.email) | (User.username == user.username)
-    ).first()
-    
-    if db_user:
-        raise HTTPException(
-            status_code=400,
-            detail="Email or username already registered"
+    try:
+        db_user = db.query(User).filter(
+            (User.email == user.email) | (User.username == user.username)
+        ).first()
+        if db_user:
+            raise HTTPException(
+                status_code=400,
+                detail="Email or username already registered"
+            )
+        hashed_password = get_password_hash(user.password)
+        db_user = User(
+            username=user.username,
+            email=user.email,
+            hashed_password=hashed_password,
+            role=user.role
         )
-    
-    hashed_password = get_password_hash(user.password)
-    db_user = User(
-        username=user.username,
-        email=user.email,
-        hashed_password=hashed_password,
-        role=user.role
-    )
-    
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    
-    return db_user
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except HTTPException:
+        raise
+    except Exception as e:
+        import logging
+        logging.error(f"Error in register_user: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
 
 @router.post("/login", response_model=Token)
 def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):

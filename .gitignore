@@ -11,9 +11,8 @@ venv/
 env/
 .env
 .venv/
-.chroma_db/
-.uploads/
-.certifcation_pdfs/
+chroma_db/
+uploads/
 # Entorno Virtual (asegúrate de que el nombre coincida con el que usas)
 # Es muy común usar 'venv', 'env' o '.venv'
 # Descomenta y ajusta si usas un nombre diferente
