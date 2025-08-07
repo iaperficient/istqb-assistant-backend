@@ -6,11 +6,11 @@ from app.rag.vector_store import get_vector_store_manager
 
 class OpenAIClient:
     def __init__(self):
-        api_key = "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"
+        api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key:
             raise HTTPException(
                 status_code=500,
-                detail="OpenAI API key not configured"
+                detail="OpenAI API key not configured (missing OPENAI_API_KEY env var)"
             )
         self.client = OpenAI(api_key=api_key)
 
@@ -42,7 +42,7 @@ Instructions:
 
 - If you don’t have enough information to answer from your embedded content, say so politely.
 
-- Always display the reference(s) used to answer the question. At the end of every answer, clearly indicate the document title, section if available of the source(s) from which the answer was obtained.
+- Always display the reference(s) used to answer the question. At the end of every answer, clearly indicate the section number if available of the source(s) from which the answer was obtained.
 
 - Present your answers using plain text only, in a clean and organized way:
     - Use clear section titles, written on a separate line (for example: Overview, Purpose, Structure, etc.).

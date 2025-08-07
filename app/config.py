@@ -1,7 +1,9 @@
 import os
 
+import os
+
 # Secret key for JWT encoding/decoding
-SECRET_KEY = "lucho123"
+SECRET_KEY = os.environ.get("SECRET_KEY", "lucho123")
 
 # Algorithm used for JWT
 ALGORITHM = "HS256"
