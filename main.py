@@ -10,6 +10,8 @@ from app.auth.sso_routes import router as sso_router
 from app.chat.routes import router as chat_router
 from app.certification.routes import router as certification_router
 from app.auth.admin_setup import create_admin_user
+from app.chat.routes import chat_with_assistant
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -35,6 +37,8 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(sso_router)
 app.include_router(chat_router)
+app.add_api_route("/api/chat",  chat_with_assistant, methods=["POST"], include_in_schema=False)
+app.add_api_route("/api/chat/", chat_with_assistant, methods=["POST"], include_in_schema=False)
 app.include_router(certification_router)
 
 @app.on_event("startup")
