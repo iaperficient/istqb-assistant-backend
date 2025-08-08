@@ -17,11 +17,6 @@ load_dotenv()
 import os
 print(f"DEBUG: FULL OPENAI_API_KEY from environment: {os.getenv('OPENAI_API_KEY')}")
 
-# Create all tables
-User.metadata.create_all(bind=engine)
-Certification.metadata.create_all(bind=engine)
-Document.metadata.create_all(bind=engine)
-ChatMessage.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="ISTQB Assistant API",
@@ -46,19 +41,18 @@ app.include_router(certification_router)
 async def startup_event():
     """Initialize application on startup"""
     try:
-        # Create admin user
+        # 1) Crear tablas (asegura que existan antes de crear el admin)
+        for meta in (User.metadata, Certification.metadata, Document.metadata, ChatMessage.metadata):
+            meta.create_all(bind=engine)
+
+        # 2) Crear admin user
         admin_user = create_admin_user()
         if admin_user:
             print(f"✅ Admin user setup completed: {admin_user.username}")
+
     except Exception as e:
         print(f"❌ Error during application startup: {e}")
 
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "service": "ISTQB Assistant API"}
-    if __name__ == "__main__":
-    import uvicorn
-    import os
-
-    port = int(os.environ.get("PORT", 8080))  # Usa el puerto que Azure define
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
