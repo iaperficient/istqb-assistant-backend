@@ -11,6 +11,10 @@ import logging
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
+@router.get("/test-route")
+async def test_chat_router():
+    return {"message": "El router de chat está funcionando correctamente!"}
+
 @router.delete("/history")
 async def delete_chat_history(
     current_user: User = Depends(get_current_active_user),
